@@ -19,7 +19,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-"""Document client class for the Azure Cosmos database service.
+"""Document client class for the Azure Cosmos DB service.
 """
 
 import requests
@@ -39,14 +39,14 @@ import azure.cosmos.session as session
 import azure.cosmos.utils as utils
 
 class CosmosClient(object):
-    """Represents a document client.
+    """Represents an Azure Cosmos DB document client.
 
-    Provides a client-side logical representation of the Azure Cosmos
-    service. This client is used to configure and execute requests against the
-    service.
+    This class provides a client-side logical representation of the Azure Cosmos DB
+    service. Use the client object to configure and execute requests against the
+    service. Create containers, add documents to containers, query documents, and more.
 
-    The service client encapsulates the endpoint and credentials used to access
-    the Azure Cosmos service.
+    The service client encapsulates the endpoint and credentials use when accessing
+    the Azure Cosmos DB service.
     """
 
     class _QueryCompatibilityMode:
@@ -184,7 +184,7 @@ class CosmosClient(object):
             Database Self Link or ID based link.
         :param object partition_resolver:
             An instance of PartitionResolver.
-        
+
         """
         if not database_link:
             raise ValueError("database_link is None or empty.")
@@ -211,7 +211,7 @@ class CosmosClient(object):
 
         return self.partition_resolvers.get(base.TrimBeginningAndEndingSlashes(database_link))
 
-        
+
     def CreateDatabase(self, database, options=None):
         """Creates a database.
 
@@ -258,7 +258,7 @@ class CosmosClient(object):
         :param dict options:
             The request options for the request.
 
-        :return: 
+        :return:
             Query Iterable of Databases.
         :rtype:
             query_iterable.QueryIterable
@@ -301,7 +301,7 @@ class CosmosClient(object):
             The link to the database.
         :param dict options:
             The request options for the request.
-            
+
         :return: Query Iterable of Collections.
         :rtype:
             query_iterable.QueryIterable
@@ -373,7 +373,7 @@ class CosmosClient(object):
 
         :param str collection_link:
             The link to the collection entity.
-        :param dict collection: 
+        :param dict collection:
             The collection to be used.
         :param dict options:
             The request options for the request.
@@ -479,7 +479,7 @@ class CosmosClient(object):
         path = base.GetPathFromLink(database_link, 'users')
         database_id = base.GetResourceIdOrFullNameFromLink(database_link)
         return database_id, path
-    
+
 
     def ReadUser(self, user_link, options=None):
         """Reads a user.
@@ -531,7 +531,7 @@ class CosmosClient(object):
 
         :return:
             Query Iterable of Users.
-        :rtype:   
+        :rtype:
             query_iterable.QueryIterable
 
         """
@@ -859,7 +859,7 @@ class CosmosClient(object):
         if(base.IsDatabaseLink(database_or_Container_link)):
             # Python doesn't have a good way of specifying an overloaded constructor, and this is how it's generally overloaded constructors are specified(by calling a @classmethod) and returning the 'self' instance
             return query_iterable.QueryIterable.PartitioningQueryIterable(self, query, options, database_or_Container_link, partition_key)
-        else:    
+        else:
             path = base.GetPathFromLink(database_or_Container_link, 'docs')
             collection_id = base.GetResourceIdOrFullNameFromLink(database_or_Container_link)
             def fetch_fn(options):
@@ -893,7 +893,7 @@ class CosmosClient(object):
             partition_key_range_id = options['partitionKeyRangeId']
 
         return self._QueryChangeFeed(collection_link, "Documents" , options, partition_key_range_id)
-        
+
     def _QueryChangeFeed(self, collection_link, resource_type, options=None, partition_key_range_id=None):
         """Queries change feed of a resource in a collection.
 
@@ -1003,13 +1003,13 @@ class CosmosClient(object):
             dict
 
         """
-        # Python's default arguments are evaluated once when the function is defined, not each time the function is called (like it is in say, Ruby). 
+        # Python's default arguments are evaluated once when the function is defined, not each time the function is called (like it is in say, Ruby).
         # This means that if you use a mutable default argument and mutate it, you will and have mutated that object for all future calls to the function as well.
         # So, using a non-mutable deafult in this case(None) and assigning an empty dict(mutable) inside the method
         # For more details on this gotcha, please refer http://docs.python-guide.org/en/latest/writing/gotchas/
         if options is None:
             options = {}
-        
+
         # We check the link to be document collection link since it can be database link in case of client side partitioning
         if(base.IsItemContainerLink(database_or_Container_link)):
             options = self._AddPartitionKey(database_or_Container_link, document, options)
@@ -1041,7 +1041,7 @@ class CosmosClient(object):
             dict
 
         """
-        # Python's default arguments are evaluated once when the function is defined, not each time the function is called (like it is in say, Ruby). 
+        # Python's default arguments are evaluated once when the function is defined, not each time the function is called (like it is in say, Ruby).
         # This means that if you use a mutable default argument and mutate it, you will and have mutated that object for all future calls to the function as well.
         # So, using a non-mutable deafult in this case(None) and assigning an empty dict(mutable) inside the method
         # For more details on this gotcha, please refer http://docs.python-guide.org/en/latest/writing/gotchas/
@@ -1064,7 +1064,7 @@ class CosmosClient(object):
 
     # Gets the collection id and path for the document
     def _GetContainerIdWithPathForItem(self, database_or_Container_link, document, options):
-        
+
         if not database_or_Container_link:
             raise ValueError("database_or_Container_link is None or empty.")
 
@@ -1076,21 +1076,21 @@ class CosmosClient(object):
         if (not document.get('id') and
             not options.get('disableAutomaticIdGeneration')):
             document['id'] = base.GenerateGuidId()
-        
+
         collection_link = database_or_Container_link
 
         if(base.IsDatabaseLink(database_or_Container_link)):
             partition_resolver = self.GetPartitionResolver(database_or_Container_link)
-        
+
             if(partition_resolver != None):
                 collection_link = partition_resolver.ResolveForCreate(document)
             else:
                 raise ValueError(CosmosClient.PartitionResolverErrorMessage)
-        
+
         path = base.GetPathFromLink(collection_link, 'docs')
         collection_id = base.GetResourceIdOrFullNameFromLink(collection_link)
         return collection_id, document, path
-    
+
     def ReadItem(self, document_link, options=None):
         """Reads a document.
 
@@ -1224,11 +1224,11 @@ class CosmosClient(object):
             trigger['body'] = str(trigger.pop('serverScript', ''))
         elif trigger.get('body'):
             trigger['body'] = str(trigger['body'])
-        
+
         path = base.GetPathFromLink(collection_link, 'triggers')
         collection_id = base.GetResourceIdOrFullNameFromLink(collection_link)
         return collection_id, path, trigger
-    
+
 
     def ReadTrigger(self, trigger_link, options=None):
         """Reads a trigger.
@@ -1359,11 +1359,11 @@ class CosmosClient(object):
             udf['body'] = str(udf.pop('serverScript', ''))
         elif udf.get('body'):
             udf['body'] = str(udf['body'])
-        
+
         path = base.GetPathFromLink(collection_link, 'udfs')
         collection_id = base.GetResourceIdOrFullNameFromLink(collection_link)
         return collection_id, path, udf
-    
+
 
     def ReadUserDefinedFunction(self, udf_link, options=None):
         """Reads a user defined function.
@@ -1497,7 +1497,7 @@ class CosmosClient(object):
         path = base.GetPathFromLink(collection_link, 'sprocs')
         collection_id = base.GetResourceIdOrFullNameFromLink(collection_link)
         return collection_id, path, sproc
-    
+
 
     def ReadStoredProcedure(self, sproc_link, options=None):
         """Reads a stored procedure.
@@ -1635,8 +1635,8 @@ class CosmosClient(object):
         CosmosClient.__ValidateResource(new_document)
         path = base.GetPathFromLink(document_link)
         document_id = base.GetResourceIdOrFullNameFromLink(document_link)
-        
-        # Python's default arguments are evaluated once when the function is defined, not each time the function is called (like it is in say, Ruby). 
+
+        # Python's default arguments are evaluated once when the function is defined, not each time the function is called (like it is in say, Ruby).
         # This means that if you use a mutable default argument and mutate it, you will and have mutated that object for all future calls to the function as well.
         # So, using a non-mutable deafult in this case(None) and assigning an empty dict(mutable) inside the function so that it remains local
         # For more details on this gotcha, please refer http://docs.python-guide.org/en/latest/writing/gotchas/
@@ -1646,7 +1646,7 @@ class CosmosClient(object):
         # Extract the document collection link and add the partition key to options
         collection_link = base.GetItemContainerLink(document_link)
         options = self._AddPartitionKey(collection_link, new_document, options)
-        
+
         return self.Replace(new_document,
                             path,
                             'docs',
@@ -1747,7 +1747,7 @@ class CosmosClient(object):
 
         :param str document_link:
             The link to the document.
-        :param (file-like stream object) readable_stream: 
+        :param (file-like stream object) readable_stream:
         :param dict options:
             The request options for the request.
 
@@ -1799,18 +1799,18 @@ class CosmosClient(object):
 
     def _GetItemIdWithPathForAttachmentMedia(self, document_link, options):
         initial_headers = dict(self.default_headers)
-        
+
         # Add required headers slug and content-type.
         if options.get('slug'):
             initial_headers[http_constants.HttpHeaders.Slug] = options['slug']
-        
+
         if options.get('contentType'):
             initial_headers[http_constants.HttpHeaders.ContentType] = (
                 options['contentType'])
         else:
             initial_headers[http_constants.HttpHeaders.ContentType] = (
                 runtime_constants.MediaTypes.OctetStream)
-        
+
         path = base.GetPathFromLink(document_link, 'attachments')
         document_id = base.GetResourceIdOrFullNameFromLink(document_link)
         return document_id, initial_headers, path
@@ -1976,7 +1976,7 @@ class CosmosClient(object):
                                                         request,
                                                         readable_stream,
                                                         headers)
-        
+
         self._UpdateSessionIfRequired(headers, result, self.last_response_headers)
         return result
 
@@ -2451,7 +2451,7 @@ class CosmosClient(object):
 
     def Upsert(self, body, path, type, id, initial_headers, options=None):
         """Upserts a Azure Cosmos resource and returns it.
-        
+
         :param dict body:
         :param str path:
         :param str type:
@@ -2524,7 +2524,7 @@ class CosmosClient(object):
                                                         request,
                                                         resource,
                                                         headers)
-        
+
         # update session for request mutates data on server side
         self._UpdateSessionIfRequired(headers, result, self.last_response_headers)
         return result
@@ -2724,7 +2724,7 @@ class CosmosClient(object):
                                 query,
                                 options,
                                 partition_key_range_id), self.last_response_headers
-    
+
     def __QueryFeed(self,
                     path,
                     type,
@@ -2749,7 +2749,7 @@ class CosmosClient(object):
 
         :rtype:
             list
-        
+
         :raises SystemError: If the query compatibility mode is undefined.
 
         """
@@ -2856,7 +2856,7 @@ class CosmosClient(object):
     # Adds the partition key to options
     def _AddPartitionKey(self, collection_link, document, options):
         collection_link = base.TrimBeginningAndEndingSlashes(collection_link)
-        
+
         #TODO: Refresh the cache if partition is extracted automatically and we get a 400.1001
 
         # If the document collection link is present in the cache, then use the cached partitionkey definition
@@ -2867,14 +2867,14 @@ class CosmosClient(object):
             collection = self.ReadContainer(collection_link)
             partitionKeyDefinition = collection.get('partitionKey')
             self.partition_key_definition_cache[collection_link] = partitionKeyDefinition
-        
-        # If the collection doesn't have a partition key definition, skip it as it's a legacy collection 
+
+        # If the collection doesn't have a partition key definition, skip it as it's a legacy collection
         if partitionKeyDefinition:
             # If the user has passed in the partitionKey in options use that elase extract it from the document
             if('partitionKey' not in options):
                 partitionKeyValue = self._ExtractPartitionKey(partitionKeyDefinition, document)
                 options['partitionKey'] = partitionKeyValue
-        
+
         return options
 
     # Extracts the partition key from the document using the partitionKey definition
@@ -2906,10 +2906,10 @@ class CosmosClient(object):
         # Match the count of hops we did to get the partitionKey with the length of partition key parts and validate that it's not a dict at that level
         if ((matchCount != expected_matchCount) or isinstance(partitionKey, dict)):
             return documents.Undefined
-         
+
         return partitionKey
-    
-    def _UpdateSessionIfRequired(self, request_headers, response_result, response_headers):    
+
+    def _UpdateSessionIfRequired(self, request_headers, response_result, response_headers):
         """
         Updates session if necessary.
 
@@ -2932,7 +2932,7 @@ class CosmosClient(object):
         if http_constants.HttpHeaders.ConsistencyLevel in request_headers:
             if documents.ConsistencyLevel.Session == request_headers[http_constants.HttpHeaders.ConsistencyLevel]:
                 is_session_consistency = True
-              
+
         if is_session_consistency:
             # update session
             self.session.update_session(response_result, response_headers)
