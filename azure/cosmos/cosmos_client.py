@@ -71,6 +71,10 @@ class CosmosClient(object):
             # Create a container
             container = client.CreateContainer(db['_self'], container_definition, options)
 
+        .. note::
+
+            It is recommended to cache and reuse this instance within your application rather than creating a new instance for every operation.
+
     :param str url_connection:
         The URL for connecting to the DB server.
     :param dict auth:
