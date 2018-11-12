@@ -81,6 +81,10 @@ class CosmosClient(object):
         The connection policy for the client.
     :param documents.ConsistencyLevel consistency_level:
         The default consistency policy for client operations.
+
+    :var Session CosmosClient.Session:
+        State of an Azure Cosmos session. This session object
+        can be shared across clients within the same process
     """
 
     class _QueryCompatibilityMode:
