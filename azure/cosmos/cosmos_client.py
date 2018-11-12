@@ -41,12 +41,33 @@ import azure.cosmos.utils as utils
 class CosmosClient(object):
     """Represents an Azure Cosmos DB document client.
 
-    This class provides a client-side logical representation of the Azure Cosmos DB
-    service. Use the client object to configure and execute requests against the
-    service. Create containers, add documents to containers, query documents, and more.
+    .. remarks::
 
-    The service client encapsulates the endpoint and credentials use when accessing
-    the Azure Cosmos DB service.
+        This class provides a client-side logical representation of the Azure Cosmos DB
+        service. Use the client object to configure and execute requests against the
+        service. Create containers, add documents to containers, query documents, and more.
+
+        The service client encapsulates the endpoint and credentials used when accessing
+        the Azure Cosmos DB service.
+
+        .. code-block:: python
+
+            import azure.cosmos.cosmos_client as cosmos_client
+
+            config = {
+                'ENDPOINT': 'FILLME',
+                'PRIMARYKEY': 'FILLME',
+                'DATABASE': 'CosmosDatabase',
+                'CONTAINER': 'CosmosContainer'
+            }
+
+            # Initialize the Cosmos client
+            client = cosmos_client.CosmosClient(url_connection=config['ENDPOINT'], auth={
+                                                'masterKey': config['PRIMARYKEY']})
+
+            # Create a database
+            db = client.CreateDatabase({'id': config['DATABASE']})
+
     """
 
     class _QueryCompatibilityMode:
@@ -167,7 +188,7 @@ class CosmosClient(object):
 
     @property
     def WriteEndpoint(self):
-        """Gets the curent write endpoint for a geo-replicated database account.
+        """Gets the current write endpoint for a geo-replicated database account.
         """
         return self._global_endpoint_manager.get_write_endpoint()
 
