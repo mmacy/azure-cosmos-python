@@ -20,6 +20,7 @@
 #SOFTWARE.
 
 """Document client class for the Azure Cosmos DB service.
+This is the primary facility for working with documents in Cosmos DB.
 """
 
 import requests
